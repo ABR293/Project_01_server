@@ -37,7 +37,7 @@ export class TrackService {
 
   async search(count = 10, offset = 0, query): Promise<Track[]> {
     const tracks = await this.trackModel
-      .find({ name: { $regexp: new RegExp(query, 'i') } })
+      .find({ name: new RegExp(query, 'i') })
       .skip(+offset)
       .limit(+count);
     return tracks;

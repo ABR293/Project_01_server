@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FileModule } from './files/file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import * as path from 'path';
+import { Gateway } from './gateway';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import * as path from 'path';
     ),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, Gateway],
 })
 export class AppModule {}

@@ -1,0 +1,14 @@
+{
+    "search.useGlobalIgnoreFiles": true,
+    "prettier.bracketSpacing": true,
+    "prettier.enable": true,
+    "prettier.useEditorConfig": true,
+    "eslint.debug": true,
+    "eslint.format.enable": true,
+    "eslint.nodeEnv": "",
+    "eslint.alwaysShowStatus": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    },
+    "java.configuration.updateBuildConfiguration": "interactive",
+}

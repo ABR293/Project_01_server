@@ -6,16 +6,21 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FileModule } from './files/file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import * as path from 'path';
+import { UserModule } from './user/user.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: `${process.env.NODE_ENV}.env`
+    }),
     FileModule,
     TrackModule,
     ServeStaticModule.forRoot({
       rootPath: path.resolve(__dirname, 'static'),
     }),
     MongooseModule.forRoot(
-      'mongodb+srv://Art_9933:Ararat@cluster0.z59qilo.mongodb.net/?retryWrites=true&w=majority',
+      process.env.DB_ADRESS
     ),
   ],
   controllers: [AppController],

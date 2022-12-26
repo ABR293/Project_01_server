@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Track, TrackDocument } from './schemas/track.schema';
-import { Comment, CommentDocument } from './schemas/comment.schema';
+import { Track, TrackDocument } from '../schemas/track.schema';
+import { Comment, CommentDocument } from '../schemas/comment.schema';
 import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { createTrackDto } from './dto/create-track.dto';
-import { createCommentDto } from './dto/create-comment.dto';
+import { createTrackDto } from '../dto/create-track.dto';
+import { createCommentDto } from '../dto/create-comment.dto';
 import { FileService, FileType } from 'src/files/file.service';
 
 @Injectable()
@@ -24,6 +24,16 @@ export class TrackService {
       picture: picturePath,
       listens: 0,
     });
+    return track;
+  }
+
+  async update(id: ObjectId, data: createTrackDto): Promise<Track> {
+    const track = await this.trackModel.findById(id);
+    const {name, artist, text } = data;
+    name && (track.name = name)
+    artist && (track.artist = artist)
+    text && (track.text = text)
+    await track.save();
     return track;
   }
 

@@ -16,6 +16,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     FileModule,
     TrackModule,
+    UserModule,
     ServeStaticModule.forRoot({
       rootPath: path.resolve(__dirname, 'static'),
     }),

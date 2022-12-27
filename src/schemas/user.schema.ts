@@ -30,6 +30,10 @@ export class User {
   @Prop()
   password: string;
 
+  @ApiProperty({example: true, description: 'is user activate his e-mail'})
+  @Prop()
+  isActivated: boolean;
+
   @ApiProperty({example: '5', description: 'path to the avatar'})
   @Prop()
   avatar: string;

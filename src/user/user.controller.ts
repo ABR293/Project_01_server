@@ -9,11 +9,13 @@ import {
     UploadedFiles,
     Query,
     Put,
+    UseGuards,
   } from '@nestjs/common';
 
   import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
   import { ObjectId } from 'mongoose';
+import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
 import { User } from 'src/schemas/user.schema';
 //   import { createCommentDto } from './dto/create-comment.dto';
   import { createUserDto } from '../dto/create-user.dto';
@@ -26,6 +28,7 @@ import { User } from 'src/schemas/user.schema';
   
     @ApiOperation({summary: 'Get all users'})
     @ApiResponse({status: 200, type: [User]})
+    @UseGuards(JwtAuthGuard)
     @Get()
     getAll(@Query('count') count: number, @Query('offset') offset: number) {
       return this.userService.getAll(count, offset);
@@ -47,17 +50,6 @@ import { User } from 'src/schemas/user.schema';
     @Get(':id')
     getOne(@Param('id') id: ObjectId) {
       return this.userService.getOne(id);
-    }
-
-    @ApiOperation({summary: 'Crerate New user'})
-    @ApiResponse({status: 200, type: [User]})
-    @Post()
-    @UseInterceptors(
-      FileFieldsInterceptor([])
-    )
-    create(@Body() dto: createUserDto) {
-      console.log(dto)
-       return this.userService.create(dto);
     }
 
     @ApiOperation({summary: 'Add awatar to user'})

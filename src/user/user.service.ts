@@ -15,30 +15,25 @@ export class UserService {
     private fileService: FileService,
   ) {}
 
-  async create(dto: createUserDto): Promise<User> {
-    const user = await this.userModel.find({ login: new RegExp(dto.login) });
-    if(!!user){
-      return 
-    } else {
-      const newUser = await this.userModel.create({
-        ...dto, 
-        avatar: '',
-        status: '',
-        info:{
-          firstName: '',
-          lastName: '',
-          nikName: '',
-          aboutMe: '',
-          contacts:{
-            email: '',
-            phone: '',
-          }
+  async createUser(dto: createUserDto): Promise<User> {
+    return await this.userModel.create({
+      ...dto,
+      isActivated: false,
+      avatar: '',
+      status: '',
+      info:{
+        firstName: '',
+        lastName: '',
+        nikName: '',
+        aboutMe: '',
+        contacts: {
+          email: '',
+          phone: '',
         },
-        frends:[],
-        dialogs:[],
-      });
-      return newUser;
-    }
+      },
+      frends: [],
+      dialogs: [],
+    })
   }
 
   async editProfileInfo (id, data) {
@@ -80,13 +75,19 @@ export class UserService {
     return users;
   }
 
+  async getUserByLogin(login:string): Promise<User> {
+    const user = await this.userModel.findOne({login});
+    return user;
+  }
+
+
   async getOne(id: ObjectId): Promise<User> {
-    const track = await this.userModel.findById(id);
-    return track;
+    const user = await this.userModel.findById(id);
+    return user;
   }
 
   async delete(id: ObjectId): Promise<ObjectId> {
-    const track = await this.userModel.findByIdAndDelete(id);
-    return track._id as unknown as ObjectId;
+    const user = await this.userModel.findByIdAndDelete(id);
+    return user._id as unknown as ObjectId;
   }
 }

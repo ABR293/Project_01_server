@@ -9,6 +9,7 @@ import {
     UploadedFiles,
     Query,
     Put,
+    Res,
   } from '@nestjs/common';
   import { FileFieldsInterceptor } from '@nestjs/platform-express';
   import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -27,7 +28,10 @@ import { AuthService } from './auth.service';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService
+  ) {}
 
 
   @ApiOperation({summary: 'Registrate New user'})
@@ -52,5 +56,22 @@ export class AuthController {
        return this.authService.login(dto);
     }
 
+  @ApiOperation({summary: 'Logout user'})
+    @ApiResponse({status: 200})
+    @Post('/login')
+    @UseInterceptors(
+      FileFieldsInterceptor([])
+    )
+    logout(@Body() dto: createUserDto) { 
+      console.log(dto)
+       return this.authService.login(dto);
+    }
 
+  @ApiOperation({summary: 'activate user'})
+    @ApiResponse({status: 200})
+    @Get('/activate/:activationLink')
+    async activate(@Param('activationLink') activationLink: string, @Res() res) { 
+      await this.userService.activateAccount(activationLink);
+      return res.redirect(process.env.CLIENT_URL);
+    }
 }

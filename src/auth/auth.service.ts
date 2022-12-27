@@ -7,6 +7,7 @@ import { User, UserDocument } from '../schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { createUserDto } from 'src/dto/create-user.dto';
 import { MailerService } from '@nestjs-modules/mailer';
+// import { MailerService } from '@nestjs-modules/mailer';
 
 const uuid = require('uuid')
 const mailService = require('../../services/mail-service')
@@ -30,21 +31,13 @@ export class AuthService {
       throw new HttpException('user already have account', HttpStatus.FORBIDDEN) 
     } else {
       const activationLink = uuid.v4()
-    //   await mailService.sendActivationMail(login, activationLink)
-      this.mailerService.sendMail({
-        to: 'varyag-93@mail.ru',
-        from: 'noreply@nestjs.com',
-        subject: 'Testing Nest MailerModule ✔', // Subject line
-        text: 'welcome', // plaintext body
-        html: '<b>welcome</b>', // HTML body content
-        })
-        .then(() => {console.log('Mail_Sended')})
-        .catch((err) => {console.log('Mail_NOT_Sended', err )});
+    await mailService.sendActivationMail(login, `${process.env.API_URL}/auth/activate/${activationLink}`)
+      .then(() => {console.log('Mail_Sended')})
+      .catch((err) => {console.log('Mail_NOT_Sended', err )});
       
-    //   const user = await this.userService.createUser(dto);
-    //   return this.generateToken(user);
-
-      return true
+      const user = await this.userService.createUser(dto, activationLink);
+      return this.generateToken(user);
+      // return true
     }
   }
 
@@ -67,9 +60,4 @@ export class AuthService {
     return this.jwtService.sign(payload)
   }
 
-
-
-    async getUserByLogin(){
-        
-    }
 }

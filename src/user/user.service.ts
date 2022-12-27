@@ -15,10 +15,11 @@ export class UserService {
     private fileService: FileService,
   ) {}
 
-  async createUser(dto: createUserDto): Promise<User> {
+  async createUser(dto: createUserDto, activationLink: string): Promise<User> {
     return await this.userModel.create({
       ...dto,
       isActivated: false,
+      activationLink,
       avatar: '',
       status: '',
       info:{
@@ -78,6 +79,18 @@ export class UserService {
   async getUserByLogin(login:string): Promise<User> {
     const user = await this.userModel.findOne({login});
     return user;
+  }
+
+  async activateAccount(activationLink:string): Promise<any> {
+    console.log('2_ActivationLink - ', activationLink)
+    const user = await this.userModel.findOne({activationLink});
+    console.log('user - ', user)
+    if(!user){
+      throw new Error('Некорректная ссылка активациии')
+    }
+    user.isActivated = true
+    await user.save()
+    return true
   }
 
 

@@ -9,7 +9,7 @@ export class createUserDto {
   readonly login: string;
 
   @ApiProperty({
-    example: '239-103929321-03910-230-120-20138d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 
+    example: '123456', 
     description: 'hash-sum of password'
   })
   readonly password: string;

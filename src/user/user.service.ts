@@ -37,8 +37,14 @@ export class UserService {
     })
   }
 
+  async update(id: ObjectId, updateUserDto:any): Promise<UserDocument> {
+    return this.userModel
+      .findByIdAndUpdate(id, updateUserDto, { new: true })
+      .exec();
+  }
+
   async editProfileInfo (id, data) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id+'');
     user.info = data
     await user.save();
     return user;
@@ -49,14 +55,14 @@ export class UserService {
     const user = await this.userModel.findById(id);
     user.avatar = picturePath
     await user.save();
-    // return user;
+    return user;
   }
 
   async setStatus(id, status: string){
     const user = await this.userModel.findById(id);
     user.status = status
     await user.save();
-    // return user;
+    return user;
   }
 
 
@@ -82,9 +88,7 @@ export class UserService {
   }
 
   async activateAccount(activationLink:string): Promise<any> {
-    console.log('2_ActivationLink - ', activationLink)
     const user = await this.userModel.findOne({activationLink});
-    console.log('user - ', user)
     if(!user){
       throw new Error('Некорректная ссылка активациии')
     }
@@ -95,7 +99,7 @@ export class UserService {
 
 
   async getOne(id: ObjectId): Promise<User> {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id+'');
     return user;
   }
 

@@ -5,8 +5,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
 import { MailerModule, MailerService } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
+import { AccessTokenStrategy } from './accessToken.strategy';
+import { RefreshTokenStrategy } from './refreshToken.strategy';
 @Module({
-  providers: [AuthService],
+  providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
   controllers: [AuthController],
   imports:[
     MailerModule.forRoot({
@@ -23,12 +25,8 @@ import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
       },
     }),
     forwardRef(() => UserModule),
-    JwtModule.register({
-      privateKey: process.env.RIVATE_KEY || 'SECRET',
-      signOptions: {
-        expiresIn: '5h'
-      }
-    })
+    // JwtModule.register({})
+    JwtModule.register({ secret: process.env.JWT_ACCESS_SECRET })
   ],
   exports:[
     AuthService,

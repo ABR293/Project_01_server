@@ -15,7 +15,7 @@ import {
   import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
   import { ObjectId } from 'mongoose';
-import { JwtAuthGuard } from 'src/auth/jwt-auth-guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { User } from 'src/schemas/user.schema';
 //   import { createCommentDto } from './dto/create-comment.dto';
   import { createUserDto } from '../dto/create-user.dto';
@@ -47,6 +47,7 @@ import { User } from 'src/schemas/user.schema';
   
     @ApiOperation({summary: 'Find one user by Id'})
     @ApiResponse({status: 200, type: [User]})
+    @UseGuards(JwtAuthGuard)
     @Get(':id')
     getOne(@Param('id') id: ObjectId) {
       return this.userService.getOne(id);
@@ -72,7 +73,6 @@ import { User } from 'src/schemas/user.schema';
       FileFieldsInterceptor([])
     )
     setStatus(@Param('id') id: ObjectId, @Body() data) {
-      console.log(data)
       const {status} = data
       return this.userService.setStatus(id, status);
     }

@@ -24,7 +24,7 @@ export class User {
   login: string; //valid e-mail
 
   @ApiProperty({
-    example: '239-103929321-03910-230-120-20138d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 
+    example: '123456', 
     description: 'hash-sum of password'
   })
   @Prop()
@@ -37,6 +37,10 @@ export class User {
   @ApiProperty({example: true, description: 'is user activate his e-mail'})
   @Prop()
   isActivated: boolean;
+
+  @ApiProperty({example: '$2a$10$RNrugE2NH4WGHDEm4oKU4OBNyfvxFIfpqzIOeDATFNoXmsNsv6G0K', description: 'refreshTokenHash'})
+  @Prop()
+  refreshToken: string | null;
 
   @ApiProperty({example: '5', description: 'path to the avatar'})
   @Prop()
@@ -68,5 +72,6 @@ export class User {
 
 }
 
+export type UserType = typeof User
 
 export const UserSchema = SchemaFactory.createForClass(User);

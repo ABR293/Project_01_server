@@ -10,6 +10,7 @@ import {
     Query,
     Put,
     Res,
+    Req,
   } from '@nestjs/common';
   import { FileFieldsInterceptor } from '@nestjs/platform-express';
   import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -40,9 +41,10 @@ export class AuthController {
     @UseInterceptors(
       FileFieldsInterceptor([])
     )
-    registration(@Body() dto: createUserDto) { 
-      console.log(dto)
-       return this.authService.registration(dto);
+    async registration(@Res({ passthrough: true }) res, @Body() dto: createUserDto) { 
+      const tokens = await this.authService.registration(dto);
+      res.cookie('refresh', tokens.refreshToken)
+      return tokens.accessToken
     }
 
   @ApiOperation({summary: 'Login user'})
@@ -51,20 +53,34 @@ export class AuthController {
     @UseInterceptors(
       FileFieldsInterceptor([])
     )
-    login(@Body() dto: createUserDto) { 
-      console.log(dto)
-       return this.authService.login(dto);
+    async login(@Res({ passthrough: true }) res, @Body() dto: createUserDto) { 
+      const tokens = await this.authService.login(dto);
+      res.cookie('refresh', tokens.refreshToken)
+      return tokens.accessToken
     }
+
 
   @ApiOperation({summary: 'Logout user'})
     @ApiResponse({status: 200})
-    @Post('/login')
+    @Post('/logout')
     @UseInterceptors(
       FileFieldsInterceptor([])
     )
-    logout(@Body() dto: createUserDto) { 
-      console.log(dto)
-       return this.authService.login(dto);
+    logout(@Body() _id: ObjectId) { 
+      return this.authService.logout(_id);
+    }
+
+  @ApiOperation({summary: 'refresh tokens'})
+    @ApiResponse({status: 200})
+    @Get('/refresh/:id')
+    @UseInterceptors(
+      FileFieldsInterceptor([])
+    )
+    async refresh(@Res({ passthrough: true }) res, @Req() req: any, @Param('id') id: ObjectId) {
+      const refreshToken = req.cookies.refresh
+      const tokens = await this.authService.refreshTokens(id, refreshToken)
+      res.cookie('refresh', tokens.refreshToken)
+      return tokens.accessToken
     }
 
   @ApiOperation({summary: 'activate user'})

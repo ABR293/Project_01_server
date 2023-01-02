@@ -2,7 +2,7 @@ import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nest
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import { ObjectId } from 'mongoose';
-import { UserSchema } from '../schemas/user.schema';
+import { UserDocument, UserSchema } from '../schemas/user.schema';
 import { createUserDto } from 'src/dto/create-user.dto';
 import { changePasswordDto } from 'src/dto/change-password-dto';
 
@@ -19,7 +19,7 @@ export class AuthService {
     // @InjectModel(User.name) private userModel: Model<UserDocument>,
   ) {}
 
-  async registration(dto: createUserDto): Promise<any> {
+  async registration(dto: createUserDto): Promise<ITokens> {
     const {login} = dto
     const candidate = await this.userService.getUserByLogin(login)
     if(!!candidate){
@@ -37,11 +37,11 @@ export class AuthService {
     }
   }
 
-  async logout(_id: ObjectId) {
+  async logout(_id: ObjectId):Promise<UserDocument> {
     return this.userService.update(_id, { refreshToken: null });
   }
 
-  async login (dto: createUserDto ){
+  async login (dto: createUserDto ): Promise<ITokens>{
     const {login, password} = dto
     const user = await this.userService.getUserByLogin(login) as any
     if(!user){
@@ -55,7 +55,7 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(_id: ObjectId, refreshToken: string) {
+  async refreshTokens(_id: ObjectId, refreshToken: string): Promise<ITokens> {
     const user = await this.userService.getOne(_id) as any
 
     if (!user || !user.refreshToken){
@@ -108,15 +108,14 @@ export class AuthService {
     return 
   }
   
-
-  async updateRefreshToken(_id: ObjectId, refreshToken: string) {
+  async updateRefreshToken(_id: ObjectId, refreshToken: string):Promise<void> {
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.userService.update(_id, {
       refreshToken: hashedRefreshToken,
     });
   }
 
-  private async generateTokens(user) {
+  private async generateTokens(user): Promise<ITokens> {
     const {login, _id, isActivated,} = user
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
@@ -130,4 +129,10 @@ export class AuthService {
     ]);
     return {accessToken, refreshToken};
   }
+}
+
+
+type ITokens = {
+  accessToken:string,
+  refreshToken: string,
 }

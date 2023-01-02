@@ -35,6 +35,23 @@ class MailService{
             `
         })
     }
+    async sendPasswordResetMail(mail, code){
+        this.transporter.sendMail({
+            from: 'barev9933@gmail.com',
+            to: mail,
+            subject:'Смена пароля пользователя',
+            text: '',
+            html:`
+            <div>
+                <h2>Для смены пароля пользователя введите указанный код</h2>
+                <h4>Введите данный код в форму</h4>
+                <h1>${code}<h1>
+                <h4>Если вы не отправляли запрос проигнорируйте это пиьмо или обратитесь в службу тех поддежки<h4>
+                <h4>ВАЖНО!!! не передавайте данный код третьим лицам!!!с<h4>
+            </div>
+            `
+        })
+    }
 }
 
 module.exports = new MailService()

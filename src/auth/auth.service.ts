@@ -1,12 +1,10 @@
 import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { FileService } from 'src/files/file.service';
 import { UserService } from 'src/user/user.service';
-import { Model, ObjectId } from 'mongoose';
-import { User, UserDocument, UserSchema, UserType } from '../schemas/user.schema';
-import { InjectModel } from '@nestjs/mongoose';
+import { ObjectId } from 'mongoose';
+import { UserSchema } from '../schemas/user.schema';
 import { createUserDto } from 'src/dto/create-user.dto';
-import { UserModule } from 'src/user/user.module';
+import { changePasswordDto } from 'src/dto/change-password-dto';
 
 var bcrypt = require('bcryptjs');
 const uuid = require('uuid')
@@ -25,7 +23,7 @@ export class AuthService {
     const {login} = dto
     const candidate = await this.userService.getUserByLogin(login)
     if(!!candidate){
-      throw new HttpException('user already have account', HttpStatus.FORBIDDEN) 
+      throw new HttpException('This e-mail already exists', HttpStatus.FORBIDDEN) 
     } else {
       const activationLink = uuid.v4()
       await mailService.sendActivationMail(login, `${process.env.API_URL}/auth/activate/${activationLink}`)
@@ -47,9 +45,9 @@ export class AuthService {
     const {login, password} = dto
     const user = await this.userService.getUserByLogin(login) as any
     if(!user){
-      throw new HttpException('no user with this email', HttpStatus.FORBIDDEN) 
+      throw new HttpException('No user with this login', HttpStatus.FORBIDDEN) 
     } else if( !await bcrypt.compare(password, user.password) ){
-      throw new HttpException('wrong password', HttpStatus.FORBIDDEN) 
+      throw new HttpException('Wrong password', HttpStatus.FORBIDDEN) 
     } else {
       const tokens = await this.generateTokens(user);
       await this.updateRefreshToken(user._id, tokens.refreshToken);
@@ -74,6 +72,42 @@ export class AuthService {
     await this.updateRefreshToken(user._id, tokens.refreshToken);
     return tokens;
   }
+
+  async fogotPassword(login:string): Promise<any> {
+    const user = await this.userService.getUserByLogin(login) as any
+    if(!user){
+      throw new HttpException('No user with this login', HttpStatus.NOT_FOUND)
+    }
+    const passwordResetCode = Math.floor(100000 + Math.random() * 900000)+''
+    await mailService.sendPasswordResetMail(login, passwordResetCode)
+    const passwordResetCodedHash = await bcrypt.hash(passwordResetCode, 10);
+    this.userService.update(user._id, {
+      passwordResetCode: passwordResetCodedHash,
+    });
+    await user.save()
+    return new HttpException(login, HttpStatus.OK)
+  }
+
+  async resetPassword(data: changePasswordDto): Promise<void> {
+    const user = await this.userService.getUserByLogin(data.login) as any
+    if(!user){
+      throw new HttpException('No user with this login', HttpStatus.NOT_FOUND)
+    }
+    const passwordResetCodedMatches = await bcrypt.compare(
+        data.secretCode+'',
+        user.passwordResetCode,
+      );
+    if(!passwordResetCodedMatches){
+      throw new HttpException('Secret Code is incorrect', HttpStatus.FORBIDDEN)
+    }
+    const passwordHash = await bcrypt.hash(data.password, 10);
+    this.userService.update(user._id, {
+      password: passwordHash,
+    });
+    await user.save()
+    return 
+  }
+  
 
   async updateRefreshToken(_id: ObjectId, refreshToken: string) {
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);

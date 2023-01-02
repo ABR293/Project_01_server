@@ -2,30 +2,20 @@ import {
     Body,
     Param,
     Controller,
-    Delete,
     Get,
     Post,
     UseInterceptors,
-    UploadedFiles,
-    Query,
-    Put,
     Res,
     Req,
   } from '@nestjs/common';
-  import { FileFieldsInterceptor } from '@nestjs/platform-express';
-  import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-  import mongoose, { ObjectId } from 'mongoose';
-  import { Track } from 'src/schemas/track.schema';
-  import { Comment } from 'src/schemas/comment.schema';
-  import { createCommentDto } from '../dto/create-comment.dto';
-  import { createTrackDto } from '../dto/create-track.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ObjectId } from 'mongoose';
+import { changePasswordDto } from 'src/dto/change-password-dto';
 import { createUserDto } from 'src/dto/create-user.dto';
-import { User } from 'src/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
-//   import { TrackService } from './track.service';
   
-
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -34,9 +24,12 @@ export class AuthController {
     private readonly userService: UserService
   ) {}
 
-
   @ApiOperation({summary: 'Registrate New user'})
-    @ApiResponse({status: 200})
+    @ApiResponse({
+      status: 200,
+      description: 'access token',
+      type: String,
+    }) 
     @Post('/registration')
     @UseInterceptors(
       FileFieldsInterceptor([])
@@ -48,7 +41,11 @@ export class AuthController {
     }
 
   @ApiOperation({summary: 'Login user'})
-    @ApiResponse({status: 200})
+    @ApiResponse({
+      status: 200,
+      description: 'access token',
+      type: String,
+    }) 
     @Post('/login')
     @UseInterceptors(
       FileFieldsInterceptor([])
@@ -62,7 +59,7 @@ export class AuthController {
 
   @ApiOperation({summary: 'Logout user'})
     @ApiResponse({status: 200})
-    @Post('/logout')
+    @Get('/logout')
     @UseInterceptors(
       FileFieldsInterceptor([])
     )
@@ -71,7 +68,11 @@ export class AuthController {
     }
 
   @ApiOperation({summary: 'refresh tokens'})
-    @ApiResponse({status: 200})
+    @ApiResponse({
+      status: 200,
+      description: 'access token',
+      type: String,
+    }) 
     @Get('/refresh/:id')
     @UseInterceptors(
       FileFieldsInterceptor([])
@@ -84,10 +85,36 @@ export class AuthController {
     }
 
   @ApiOperation({summary: 'activate user'})
-    @ApiResponse({status: 200})
+    @ApiResponse({
+      status: 200,
+      description:'activate user'
+    })
     @Get('/activate/:activationLink')
     async activate(@Param('activationLink') activationLink: string, @Res() res) { 
       await this.userService.activateAccount(activationLink);
       return res.redirect(process.env.CLIENT_URL);
+    }
+
+  @ApiOperation({summary: 'if usefr fogot password we send en email'})
+    @ApiResponse({
+      status: 200, 
+      description: 'send e-mail with secret code'
+    })
+    @Get('/fogotPassword/:login')
+    fogotPassword(@Param('login') login: string) { 
+      return this.authService.fogotPassword(login);
+    }
+
+  @ApiOperation({summary: 'set new Password for user'})
+    @ApiResponse({
+      status: 200,
+      description: 'change password of User'
+    })
+    @Post('/resetPassword')
+    @UseInterceptors(
+      FileFieldsInterceptor([])
+    )
+    resetPassword( @Body() data:changePasswordDto) { 
+      return this.authService.resetPassword(data);
     }
 }

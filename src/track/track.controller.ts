@@ -25,7 +25,11 @@ export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @ApiOperation({summary: 'Create new track'})
-  @ApiResponse({status: 200, type: Track})
+  @ApiResponse({
+    status: 200,
+    description: 'new track',
+    type: Track
+  })
   @Post()
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -40,21 +44,33 @@ export class TrackController {
   }
 
   @ApiOperation({summary: 'Edit track information'})
-  @ApiResponse({status: 200, type:Track})
+  @ApiResponse({
+    status: 200,
+    description:'edit end return new track',
+    type:Track
+  })
   @Put(':id')
   update(@Param('id') id: ObjectId, @Body() dto: createTrackDto) {
     return this.trackService.update(id, dto);
   }
 
   @ApiOperation({summary: 'Get all tracks'})
-  @ApiResponse({status: 200, type: [Track]})
+  @ApiResponse({
+    status: 200, 
+    description: 'return all tracks',
+    type: [Track]
+  })
   @Get()
   getAll(@Query('count') count: number, @Query('offset') offset: number) {
     return this.trackService.getAll(count, offset);
   }
 
   @ApiOperation({summary: 'Get tracks that you want to find'})
-  @ApiResponse({status: 200, type: [Track]})
+  @ApiResponse({
+    status: 200, 
+    description: 'find and return tracks with params',
+    type: [Track]
+  })
   @Get('/search')
   search(
     @Query('count') count: number,
@@ -65,14 +81,21 @@ export class TrackController {
   }
 
   @ApiOperation({summary: 'Get one track'})
-  @ApiResponse({status: 200, type:Track})
+  @ApiResponse({
+    status: 200, 
+    description: 'find and return one track',
+    type: Track
+  })
   @Get(':id')
   getOne(@Param('id') id: ObjectId) {
     return this.trackService.getOne(id);
   }
   
   @ApiOperation({summary: 'Delete  track'})
-  @ApiResponse({status: 200, type: mongoose.Types.ObjectId})
+  @ApiResponse({
+    status: 200,
+    description: 'return id of deleted track',
+    type: mongoose.Types.ObjectId})
   @Delete(':id')
   delete(@Param('id') id: ObjectId) {
     return this.trackService.delete(id);
@@ -86,7 +109,10 @@ export class TrackController {
   }
 
   @ApiOperation({summary: 'add 1 listen to track'})
-  @ApiResponse({status: 200})
+  @ApiResponse({
+    status: 200,
+    description: 'add one lissten to track',
+  })
   @Post('/listen/:id')
   listen(@Param('id') id: ObjectId) {
     return this.trackService.listen(id);

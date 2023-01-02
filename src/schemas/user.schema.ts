@@ -23,16 +23,17 @@ export class User {
   @Prop()
   login: string; //valid e-mail
 
-  @ApiProperty({
-    example: '123456', 
-    description: 'hash-sum of password'
-  })
+  @ApiProperty({example: '123456', description: 'password'})
   @Prop()
   password: string;
 
-  @ApiProperty({example: '', description: 'is user activate his e-mail'})
+  @ApiProperty({example: '', description: 'link for userActivation'})
   @Prop()
   activationLink: string;
+
+  @ApiProperty({example: '', description: 'Code for resetting user Password'})
+  @Prop()
+  passwordResetCode: string | null;
 
   @ApiProperty({example: true, description: 'is user activate his e-mail'})
   @Prop()

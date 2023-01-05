@@ -7,17 +7,13 @@ import { FileModule } from './files/file.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import * as path from 'path';
 import { UserModule } from './user/user.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { join } from 'path';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: `${process.env.NODE_ENV}.env`
+      envFilePath: `${process.env.NODE_ENV}.env`,
     }),
     FileModule,
     TrackModule,
@@ -25,9 +21,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     ServeStaticModule.forRoot({
       rootPath: path.resolve(__dirname, 'static'),
     }),
-    MongooseModule.forRoot(
-      process.env.DB_URL
-    ),
+    MongooseModule.forRoot(process.env.DB_URL),
     AuthModule,
   ],
   controllers: [AppController],

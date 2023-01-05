@@ -24,11 +24,11 @@ import { TrackService } from './track.service';
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
-  @ApiOperation({summary: 'Create new track'})
+  @ApiOperation({ summary: 'Create new track' })
   @ApiResponse({
     status: 200,
     description: 'new track',
-    type: Track
+    type: Track,
   })
   @Post()
   @UseInterceptors(
@@ -39,37 +39,37 @@ export class TrackController {
   )
   create(@UploadedFiles() files, @Body() dto: createTrackDto) {
     const { picture, audio } = files;
-    console.log('dtoT', dto)
+    console.log('dtoT', dto);
     return this.trackService.create(dto, picture[0], audio[0]);
   }
 
-  @ApiOperation({summary: 'Edit track information'})
+  @ApiOperation({ summary: 'Edit track information' })
   @ApiResponse({
     status: 200,
-    description:'edit end return new track',
-    type:Track
+    description: 'edit end return new track',
+    type: Track,
   })
   @Put(':id')
   update(@Param('id') id: ObjectId, @Body() dto: createTrackDto) {
     return this.trackService.update(id, dto);
   }
 
-  @ApiOperation({summary: 'Get all tracks'})
+  @ApiOperation({ summary: 'Get all tracks' })
   @ApiResponse({
-    status: 200, 
+    status: 200,
     description: 'return all tracks',
-    type: [Track]
+    type: [Track],
   })
   @Get()
   getAll(@Query('count') count: number, @Query('offset') offset: number) {
     return this.trackService.getAll(count, offset);
   }
 
-  @ApiOperation({summary: 'Get tracks that you want to find'})
+  @ApiOperation({ summary: 'Get tracks that you want to find' })
   @ApiResponse({
-    status: 200, 
+    status: 200,
     description: 'find and return tracks with params',
-    type: [Track]
+    type: [Track],
   })
   @Get('/search')
   search(
@@ -80,35 +80,36 @@ export class TrackController {
     return this.trackService.search(count, offset, query);
   }
 
-  @ApiOperation({summary: 'Get one track'})
+  @ApiOperation({ summary: 'Get one track' })
   @ApiResponse({
-    status: 200, 
+    status: 200,
     description: 'find and return one track',
-    type: Track
+    type: Track,
   })
   @Get(':id')
   getOne(@Param('id') id: ObjectId) {
     return this.trackService.getOne(id);
   }
-  
-  @ApiOperation({summary: 'Delete  track'})
+
+  @ApiOperation({ summary: 'Delete  track' })
   @ApiResponse({
     status: 200,
     description: 'return id of deleted track',
-    type: mongoose.Types.ObjectId})
+    type: mongoose.Types.ObjectId,
+  })
   @Delete(':id')
   delete(@Param('id') id: ObjectId) {
     return this.trackService.delete(id);
   }
 
-  @ApiOperation({summary: 'add comment to track'})
-  @ApiResponse({status: 200, type:Comment })
+  @ApiOperation({ summary: 'add comment to track' })
+  @ApiResponse({ status: 200, type: Comment })
   @Post('/comment')
   addComment(@Body() dto: createCommentDto) {
     return this.trackService.addComment(dto);
   }
 
-  @ApiOperation({summary: 'add 1 listen to track'})
+  @ApiOperation({ summary: 'add 1 listen to track' })
   @ApiResponse({
     status: 200,
     description: 'add one lissten to track',

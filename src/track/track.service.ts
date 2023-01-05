@@ -29,10 +29,10 @@ export class TrackService {
 
   async update(id: ObjectId, data: createTrackDto): Promise<Track> {
     const track = await this.trackModel.findById(id);
-    const {name, artist, text } = data;
-    name && (track.name = name)
-    artist && (track.artist = artist)
-    text && (track.text = text)
+    const { name, artist, text } = data;
+    name && (track.name = name);
+    artist && (track.artist = artist);
+    text && (track.text = text);
     await track.save();
     return track;
   }

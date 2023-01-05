@@ -4,7 +4,6 @@ import { User, UserDocument } from '../schemas/user.schema';
 import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { createUserDto } from '../dto/create-user.dto';
-import { createCommentDto } from '../dto/create-comment.dto';
 import { FileService, FileType } from 'src/files/file.service';
 
 @Injectable()
@@ -22,7 +21,7 @@ export class UserService {
       activationLink,
       avatar: '',
       status: '',
-      info:{
+      info: {
         firstName: '',
         lastName: '',
         nikName: '',
@@ -34,37 +33,36 @@ export class UserService {
       },
       frends: [],
       dialogs: [],
-    })
+    });
   }
 
-  async update(id: ObjectId, updateUserDto:any): Promise<UserDocument> {
+  async update(id: ObjectId, updateUserDto: any): Promise<UserDocument> {
     return this.userModel
       .findByIdAndUpdate(id, updateUserDto, { new: true })
       .exec();
   }
 
-  async editProfileInfo (id, data) {
-    const user = await this.userModel.findById(id+'');
-    user.info = data
+  async editProfileInfo(id, data) {
+    const user = await this.userModel.findById(id + '');
+    user.info = data;
     await user.save();
     return user;
   }
 
-  async setAvatar(id, picture){
+  async setAvatar(id, picture) {
     const picturePath = this.fileService.createFile(FileType.IMAGE, picture);
     const user = await this.userModel.findById(id);
-    user.avatar = picturePath
+    user.avatar = picturePath;
     await user.save();
     return user;
   }
 
-  async setStatus(id, status: string){
+  async setStatus(id, status: string) {
     const user = await this.userModel.findById(id);
-    user.status = status
+    user.status = status;
     await user.save();
     return user;
   }
-
 
   async getAll(count = 10, offset = 0): Promise<User[]> {
     const users = await this.userModel
@@ -82,24 +80,23 @@ export class UserService {
     return users;
   }
 
-  async getUserByLogin(login:string): Promise<User> {
-    const user = await this.userModel.findOne({login});
+  async getUserByLogin(login: string): Promise<User> {
+    const user = await this.userModel.findOne({ login });
     return user;
   }
 
-  async activateAccount(activationLink:string): Promise<any> {
-    const user = await this.userModel.findOne({activationLink});
-    if(!user){
-      throw new Error('Некорректная ссылка активациии')
+  async activateAccount(activationLink: string): Promise<any> {
+    const user = await this.userModel.findOne({ activationLink });
+    if (!user) {
+      throw new Error('Некорректная ссылка активациии');
     }
-    user.isActivated = true
-    await user.save()
-    return true
+    user.isActivated = true;
+    await user.save();
+    return true;
   }
 
-
   async getOne(id: ObjectId): Promise<User> {
-    const user = await this.userModel.findById(id+'');
+    const user = await this.userModel.findById(id + '');
     return user;
   }
 
